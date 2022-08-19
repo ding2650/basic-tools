@@ -8,7 +8,7 @@
 - use shortcut keys `command + Shift + F ` or click dock selection to open cliboard history
 ```
 ## TODOLIST
-- support img history 
+- copy card 
 - support screenshot
 - support screen recording
 - not block user behavior 
