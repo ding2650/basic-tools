@@ -14,33 +14,46 @@ import { getPoetry } from '../api';
 import {
   ActionType,
   ChannelProps,
+  CopyCardProps,
   ICopyValProps,
   IpcMainEvents,
 } from '../../interface';
-import { setImageItem, setTextItem } from './setItem';
+import { setCardItem, setImageItem, setTextItem } from './setItem';
 import bindEvents from './bindEvents';
 import getAssetPath from './getAssetPath';
 import { MenuBuilder } from './debugTools';
-import { StorageKey } from '../../const';
+import { CardStorageKey, CliboardStorageKey } from '../../const';
 import copyItem from './copyItem';
 import isImage from './isImageType';
 
 const store = new Store();
 
 const MAX_COUNT = 100;
+
+enum WindowRouteMap {
+  HISTORY = 'HISTORY',
+  CARD = 'CARD',
+}
 export default class Moniter {
   timer: NodeJS.Timer = null as any;
 
   store = store;
 
+  pageName = '';
+
   window: BrowserWindow | null = null;
 
   tray: Tray | null = null;
 
+  currentRoute = WindowRouteMap.HISTORY;
+
   cliboardList: Array<ICopyValProps> = [];
 
+  cardList: Array<CopyCardProps> = [];
+
   constructor() {
-    this.cliboardList = this.store.get(StorageKey) || ([] as any);
+    this.cliboardList = this.store.get(CliboardStorageKey) || ([] as any);
+    this.cardList = this.store.get(CardStorageKey) || ([] as any);
   }
 
   isTextChange() {
@@ -68,7 +81,7 @@ export default class Moniter {
           this.reOrder(payload);
           break;
         case ActionType.InitList:
-          this.updateRenderer();
+          this.updateHistoryList();
           this.updatePoetry();
           break;
         case ActionType.Hide:
@@ -83,13 +96,61 @@ export default class Moniter {
     });
   }
 
-  async switchWindowVisible() {
+  addCardItem(newItem: CopyCardProps) {
+    this.cardList = [setCardItem(newItem), ...this.cardList];
+    this.store.set(CardStorageKey, this.cardList);
+    this.window?.webContents.send('openCard', this.cardList);
+  }
+
+  editCardItem(val: CopyCardProps & { oldAlias: string }) {
+    const { oldAlias, ...newItem } = val;
+    const filterList = this.cardList.filter((v) => v.alias !== oldAlias);
+    this.cardList = [setCardItem(newItem), ...filterList];
+    this.store.set(CardStorageKey, this.cardList);
+    this.window?.webContents.send('openCard', this.cardList);
+  }
+
+  deleteCardItem(newItem: CopyCardProps) {
+    this.cardList = this.cardList.filter((v) => v.alias !== newItem.alias);
+    this.store.set(CardStorageKey, this.cardList);
+    this.window?.webContents.send('openCard', this.cardList);
+  }
+
+  initCardMessageHandler() {
+    const run = (arg: ChannelProps) => {
+      const { actionType, payload } = arg;
+      switch (actionType) {
+        case ActionType.AddCard:
+          this.addCardItem(payload);
+          break;
+        case ActionType.EditCard:
+          this.editCardItem(payload);
+          break;
+        case ActionType.DeleteCard:
+          this.deleteCardItem(payload);
+          break;
+        case ActionType.InitList:
+          this.window?.webContents.send('openCard', this.cardList);
+          break;
+        default:
+          break;
+      }
+    };
+    ipcMain.on(IpcMainEvents.Card, async (_, arg) => {
+      run(arg);
+    });
+  }
+
+  async switchHistoryVisible() {
     const visible = this.window!.isVisible();
-    if (visible) {
+    const isHistory = this.currentRoute === WindowRouteMap.HISTORY;
+    if (visible && isHistory) {
       this.window!.hide();
+      this.window?.webContents.send('hideWindow');
     } else {
       this.updatePoetry();
-      this.updateRenderer();
+      this.updateHistoryList();
+      this.currentRoute = WindowRouteMap.HISTORY;
       this.window!.show();
     }
   }
@@ -99,12 +160,26 @@ export default class Moniter {
     app.quit();
   }
 
+  switchCardVisible() {
+    const visible = this.window!.isVisible();
+    const isCard = this.currentRoute === WindowRouteMap.CARD;
+    if (visible && isCard) {
+      this.window!.hide();
+      this.window?.webContents.send('hideWindow');
+    } else {
+      this.window?.webContents.send('openCard', this.cardList);
+      this.window!.show();
+      this.currentRoute = WindowRouteMap.CARD;
+    }
+  }
+
   createTray() {
     const icon = nativeImage.createFromPath(getAssetPath('tray.png'));
     const tray = new Tray(icon);
     const contextMenu = Menu.buildFromTemplate([
-      { label: 'cliboard', click: () => this.switchWindowVisible() },
+      { label: 'cliboard', click: () => this.switchHistoryVisible() },
       { label: 'clear', click: () => this.clearCache() },
+      { label: 'card', click: () => this.switchCardVisible() },
       { label: 'quit', click: () => this.quitApp() },
     ]);
     tray.setContextMenu(contextMenu);
@@ -112,8 +187,9 @@ export default class Moniter {
   }
 
   registHotKey() {
-    globalShortcut.register('Command+Shift+F', () =>
-      this.switchWindowVisible()
+    globalShortcut.register('Command+Shift+F', () => this.switchCardVisible());
+    globalShortcut.register('Command+Shift+D', () =>
+      this.switchHistoryVisible()
     );
   }
 
@@ -159,28 +235,29 @@ export default class Moniter {
       }
     }
     this.cliboardList = newList;
-    this.store.set(StorageKey, newList);
+    this.store.set(CliboardStorageKey, newList);
   }
 
   clearCache() {
+    // TODO: Is it possible to encapsulate a method to delete a folder
     const imgList = this.cliboardList.filter((v) => isImage(v.type));
     imgList.forEach((v) => {
       unlink(v.value, () => {});
     });
-
-    this.store.set(StorageKey, []);
+    this.store.set(CliboardStorageKey, []);
     this.cliboardList = [];
-    this.updateRenderer();
+    this.updateHistoryList();
   }
 
   reOrder(oldItem: ICopyValProps) {
+    console.log('reORder', oldItem);
     const { value } = oldItem;
     const newItem = setTextItem(value);
     this.cliboardList = this.cliboardList.filter((v) => v.value !== value);
     this.syncAdd(newItem);
   }
 
-  updateRenderer() {
+  updateHistoryList() {
     const newList = this.cliboardList.map((v) => {
       if (!isImage(v.type)) return v;
       return {
@@ -188,7 +265,7 @@ export default class Moniter {
         url: nativeImage.createFromPath(v.value).toDataURL(),
       };
     });
-    this.window!.webContents.send('openWindow', newList);
+    this.window!.webContents.send('openHistory', newList);
   }
 
   async updatePoetry() {
@@ -199,6 +276,7 @@ export default class Moniter {
   }
 
   stop() {
+    // TODO: When user is inactive, it should be called.
     clearInterval(this.timer);
   }
 }

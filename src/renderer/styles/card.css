@@ -1,0 +1,119 @@
+.card-container {
+  color: #312520;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #f6ffed;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  border-radius: 8px;
+  background: transparent;
+  background: #b7eb8f;
+}
+
+.card-item-header {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.card-body {
+  max-height: 100%;
+  overflow: scroll;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding-top: 12px;
+}
+
+.card-item,
+.card-item-editing {
+  height: 66px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 8px 12px;
+  background: #95de64;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  line-height: 20px;
+  transition: all .52s ease-in-out;
+  opacity: .8;
+
+}
+
+
+.card-alias {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  font-weight: bold;
+  color: #000;
+}
+
+.card-item:hover {
+  background-color: #95de64;
+  opacity: 1;
+}
+
+.card-item-editing {
+  justify-content: center;
+  gap: 6px;
+}
+
+.edit-item {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.edit-item span {
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 6px;
+  color: #ff7500;
+  font-weight: bold;
+}
+
+.edit-item input {
+  text-indent: 36px;
+  font-size: 14px;
+  border-radius: 5px;
+  height: 20px;
+}
+
+.card-handler {
+  visibility: hidden;
+  display: flex;
+  gap: 5px;
+}
+
+.card-item-value {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 3px;
+  color: #262626;
+  font-size: 14px;
+}
+
+
+.card-item-tag {
+  font-size: 12px;
+}
+
+
+.card-item:hover .card-handler {
+  visibility: visible;
+}

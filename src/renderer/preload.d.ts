@@ -1,8 +1,10 @@
+import { Clipboard } from 'electron';
 import { Channels } from 'main/preload';
 
 declare global {
   interface Window {
     electron: {
+      cliboard: Clipboard;
       ipcRenderer: {
         sendMessage(channel: Channels, args: object): void;
         on(

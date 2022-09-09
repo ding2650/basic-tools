@@ -7,6 +7,11 @@
 - install the package (dir: /release/build/xxx.dmg|xxx.exe)
 - use shortcut keys `command + Shift + F ` or click dock selection to open cliboard history
 ```
+
+## FEATURE
+- cliboard history 
+  - text
+  - image
 ## TODOLIST
 - copy card 
 - support screenshot

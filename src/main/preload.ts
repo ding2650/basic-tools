@@ -1,8 +1,14 @@
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import {
+  clipboard,
+  contextBridge,
+  ipcRenderer,
+  IpcRendererEvent,
+} from 'electron';
 import { IpcMainEvents } from '../interface';
 
 export type Channels = IpcMainEvents;
 contextBridge.exposeInMainWorld('electron', {
+  cliboard: clipboard,
   ipcRenderer: {
     sendMessage(channel: Channels, args: object) {
       ipcRenderer.send(channel, args);

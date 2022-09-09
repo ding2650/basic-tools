@@ -1,0 +1,8 @@
+.search-input {
+  flex: 1;
+  border-radius: 8px;
+  text-indent: 2px;
+  height: 24px;
+  color: inherit;
+  background-color: transparent;
+}

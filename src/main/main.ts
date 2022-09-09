@@ -50,6 +50,7 @@ async function appReady() {
   app.dock.hide();
   m = new Moniter();
   m.initMessageHandler();
+  m.initCardMessageHandler();
   mainWindow = await createWindow();
   // keep this global link of mainWindow
   m.setWindow(mainWindow);

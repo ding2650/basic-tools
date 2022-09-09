@@ -1,4 +1,4 @@
-import React, {
+import {
   ChangeEvent,
   useEffect,
   useLayoutEffect,
@@ -16,11 +16,11 @@ import isImage from '../../../main/utils/isImageType';
 import { isValid } from '../../utils';
 import Poetry from '../Poetry';
 import CopyItem, { onCopyItem } from './CopyItem';
-import Input from './Input';
+import Input from '../common/Input';
 import Preview from './Preview';
 
 const BaseHeight = 24;
-const CliboardWindow = () => {
+const CliboardHistory = () => {
   const [list, setList] = useState<Array<ICopyValProps>>([]);
   const [currentVal, setCurrentVal] = useState('');
   const [filterWords, setFilterWords] = useState('');
@@ -37,7 +37,7 @@ const CliboardWindow = () => {
     window.electron.ipcRenderer.sendMessage(IpcMainEvents.Cliboard, {
       actionType: ActionType.InitList,
     });
-    window.electron.ipcRenderer.on('openWindow', (arg) => {
+    window.electron.ipcRenderer.on('openHistory', (arg) => {
       const initList = arg as Array<ICopyValProps>;
       setList(initList);
       setCurrentVal(initList[0]?.value || '');
@@ -56,6 +56,11 @@ const CliboardWindow = () => {
   useLayoutEffect(() => {
     const handler = (e: KeyboardEvent) => {
       switch (e.key) {
+        case 'Enter':
+          if (currentVal) {
+            onCopyItem(currentItem);
+          }
+          break;
         case 'Escape':
           window.electron.ipcRenderer.sendMessage(IpcMainEvents.Cliboard, {
             actionType: ActionType.Hide,
@@ -79,11 +84,13 @@ const CliboardWindow = () => {
     return () => {
       document.removeEventListener('keyup', handler);
     };
-  }, [currentIndex, list]);
+  }, [currentIndex, list, currentItem, currentVal]);
 
   const renderList = useMemo(() => {
     const filterList = list.filter((v) => {
-      const textIsIncludeWords = v.value.includes(filterWords);
+      const textIsIncludeWords = v.value
+        .toLocaleLowerCase()
+        .includes(filterWords.toLocaleLowerCase());
       if (!isValid) return false;
       const isIncludeImg = SupportType.IMAGE.startsWith(
         filterWords.toLocaleLowerCase()
@@ -92,14 +99,6 @@ const CliboardWindow = () => {
     });
     return filterList;
   }, [list, filterWords]);
-
-  const onkeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const { key } = e;
-    const isEnter = key === 'Enter';
-    if (isEnter && currentVal) {
-      onCopyItem(currentItem);
-    }
-  };
 
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -114,7 +113,7 @@ const CliboardWindow = () => {
     <div className="full">
       <main id="his-container">
         <header className="his-header">
-          <Input value={filterWords} onChange={onInput} onkeydown={onkeydown} />
+          <Input value={filterWords} onChange={onInput} />
         </header>
         <div className="his-body">
           <ul ref={containerRef as any} className="his-list">
@@ -137,4 +136,4 @@ const CliboardWindow = () => {
   );
 };
 
-export default CliboardWindow;
+export default CliboardHistory;

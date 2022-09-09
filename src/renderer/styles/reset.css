@@ -1,0 +1,77 @@
+body,
+ol,
+ul,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+th,
+td,
+dl,
+dd,
+form,
+fieldset,
+legend,
+input,
+textarea,
+select {
+  margin: 0;
+  padding: 0
+}
+
+* {
+  user-select: none;
+}
+
+a {
+  color: #172c45;
+  text-decoration: none
+}
+
+:root {
+  --base-space: 8px;
+}
+
+a:hover {
+  color: #cd0200;
+  text-decoration: underline;
+}
+
+em {
+  font-style: normal;
+}
+
+li {
+  list-style: none;
+
+}
+
+img {
+  border: 0;
+  vertical-align: middle;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+p {
+  word-wrap: break-word;
+}
+
+input {
+  border: none;
+  outline: none;
+  width: 100%;
+  padding: 5px 12px;
+
+}
+
+input:hover,
+input:focus {
+  outline: none;
+}

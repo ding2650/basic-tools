@@ -1,2 +1,2 @@
-export const StorageKey = 'CLIBOARD_CACHE_KEY';
-export const HasBeenShownKey = 'HAS_BEEN_SHOWN_KEY';
+export const CliboardStorageKey = 'CLIBOARD_CACHE_KEY';
+export const CardStorageKey = 'CARD_CACHE_KEY';

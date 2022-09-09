@@ -3,6 +3,9 @@ export enum SupportType {
   IMAGE = 'image',
 }
 export enum ActionType {
+  AddCard = 'ADD_CARD',
+  EditCard = 'EDIT_CARD',
+  DeleteCard = 'DELETE_CARD',
   CopyItem = 'COPY_ITEM',
   InitList = 'INIT_LIST',
   InitPoetry = 'INIT_POETRY',
@@ -11,6 +14,7 @@ export enum ActionType {
 
 export enum IpcMainEvents {
   Cliboard = 'CLIBOARD',
+  Card = 'CARD',
   UpdatePoetry = 'UPDATE_POETRY',
 }
 
@@ -33,4 +37,10 @@ export interface ICopyValProps {
 export interface ChannelProps {
   actionType: ActionType;
   payload: ICopyValProps;
+}
+
+export interface CopyCardProps {
+  alias: string;
+  value: string;
+  updateDate?: string;
 }
