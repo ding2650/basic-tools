@@ -1,16 +1,16 @@
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import Moniter from './utils/cliboardMoniter';
 import installDebugTools, { installExtensions } from './utils/debugTools';
 import getAssetPath from './utils/getAssetPath';
+import setMenu from './utils/menu';
 import { resolveHtmlPath } from './utils/resolveHtmlPath';
-
-Menu.setApplicationMenu(null);
 
 let mainWindow: BrowserWindow | null = null;
 let m: Moniter;
 let appTray = null;
 
+setMenu();
 installDebugTools();
 
 app.setLoginItemSettings({
