@@ -129,6 +129,9 @@ export default class Moniter {
         case ActionType.DeleteCard:
           this.deleteCardItem(payload);
           break;
+        case ActionType.Hide:
+          this.window?.hide();
+          break;
         case ActionType.InitList:
           this.window?.webContents.send('openCard', this.cardList);
           break;

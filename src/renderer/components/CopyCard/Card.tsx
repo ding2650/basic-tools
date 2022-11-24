@@ -1,5 +1,9 @@
 import { ChangeEvent, useLayoutEffect, useState } from 'react';
-import { CopyCardProps } from '../../../interface/index';
+import {
+  ActionType,
+  CopyCardProps,
+  IpcMainEvents,
+} from '../../../interface/index';
 import EditCard from './EditCard';
 import ItemHeader from './Header';
 import Preview from './Preview';
@@ -22,6 +26,9 @@ const Card = (props: IProps) => {
 
   const onCopy = () => {
     window.electron.cliboard.writeText(item.value, 'clipboard');
+    window.electron.ipcRenderer.sendMessage(IpcMainEvents.Card, {
+      actionType: ActionType.Hide,
+    });
   };
 
   useLayoutEffect(() => {

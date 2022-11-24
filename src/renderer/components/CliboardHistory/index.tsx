@@ -100,20 +100,6 @@ const CliboardHistory = () => {
     };
   }, [currentIndex, list, currentItem, currentVal]);
 
-  const renderList = useMemo(() => {
-    const filterList = list.filter((v) => {
-      const textIsIncludeWords = v.value
-        .toLocaleLowerCase()
-        .includes(filterWords.toLocaleLowerCase());
-      if (!isValid) return false;
-      const isIncludeImg = SupportType.IMAGE.startsWith(
-        filterWords.toLocaleLowerCase()
-      );
-      return textIsIncludeWords || (isIncludeImg && isImage(v.type));
-    });
-    return filterList;
-  }, [list, filterWords]);
-
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     const filterList = filter(value, list);
