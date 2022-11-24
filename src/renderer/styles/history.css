@@ -48,7 +48,6 @@
 .his-list {
   height: calc(100vh - 88px);
   overflow: scroll;
-  scroll-snap-type: y mandatory;
   scroll-padding-top: 20px;
 }
 

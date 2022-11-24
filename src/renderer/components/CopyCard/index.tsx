@@ -7,7 +7,7 @@ import parse from './const';
 const Index = () => {
   const [inputValue, setInputValue] = useState('');
   const [cardList, setCardList] = useState([] as Array<CopyCardProps>);
-  const onInpuChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
   const renderList = useMemo(() => {
@@ -61,7 +61,11 @@ const Index = () => {
   return (
     <div className="card-container">
       <header className="card-header">
-        <Input value={inputValue} onChange={onInpuChange} onEnter={onExecute} />
+        <Input
+          value={inputValue}
+          onChange={onInputChange}
+          onEnter={onExecute}
+        />
       </header>
       <div className="card-body">
         {renderList.map((v) => {

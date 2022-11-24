@@ -20,6 +20,20 @@ import Input from '../common/Input';
 import Preview from './Preview';
 
 const BaseHeight = 24;
+
+const filter = (filterWords: string, list: Array<ICopyValProps>) => {
+  const filterList = list.filter((v) => {
+    const textIsIncludeWords = v.value
+      .toLocaleLowerCase()
+      .includes(filterWords.toLocaleLowerCase());
+    if (!isValid) return false;
+    const isIncludeImg = SupportType.IMAGE.startsWith(
+      filterWords.toLocaleLowerCase()
+    );
+    return textIsIncludeWords || (isIncludeImg && isImage(v.type));
+  });
+  return filterList;
+};
 const CliboardHistory = () => {
   const [list, setList] = useState<Array<ICopyValProps>>([]);
   const [currentVal, setCurrentVal] = useState('');
@@ -102,6 +116,8 @@ const CliboardHistory = () => {
 
   const onInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
+    const filterList = filter(value, list);
+    setCurrentVal(filterList[0]?.value || '');
     setFilterWords(value);
   };
 
@@ -117,7 +133,7 @@ const CliboardHistory = () => {
         </header>
         <div className="his-body">
           <ul ref={containerRef as any} className="his-list">
-            {renderList.map((item) => {
+            {filter(filterWords, list).map((item) => {
               return (
                 <CopyItem
                   isActive={item.value === currentVal}

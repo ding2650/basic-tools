@@ -19,8 +19,10 @@ export const getToken = (): Promise<{ data: string }> => {
 export const getPoetry = async (): Promise<{ data: any }> => {
   let token = store.get('userToken');
   if (!token) {
-    const { data } = await getToken();
-    token = data;
+    try {
+      const { data } = await getToken();
+      token = data;
+    } catch (e) {}
   }
   return new Promise((resolve, reject) => {
     const request = net.request('https://v2.jinrishici.com/sentence');
